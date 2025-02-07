@@ -68,12 +68,18 @@ async function parseExcelFile(
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
   const lines = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
-  console.log(lines);
 
   if (lines.length === 0) throw new Error("INVALID_HEADERS");
 
   // Normalize Excel headers and schema headers
-  const excelHeaders = lines[0].map(header => String(header).normalize("NFD").trim().toLowerCase());
+  const excelHeaders = lines[0].map(header => String(header)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+    .replace(/^(\d)/, "n$1")
+    .replace(/(\d)$/, "$1")
+  );
 
   if (!validateHeaders(excelHeaders, headersSchema)) throw new Error("INVALID_HEADERS");
 
