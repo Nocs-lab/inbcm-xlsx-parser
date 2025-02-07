@@ -68,6 +68,7 @@ async function parseExcelFile(
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
   const lines = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
+  console.log(lines);
 
   if (lines.length === 0) throw new Error("INVALID_HEADERS");
 
