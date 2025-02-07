@@ -2,15 +2,6 @@ import * as XLSX from "xlsx";
 import { arquivistico, bibliografico, museologico } from "./schema.js";
 
 /**
- * Normalizes headers by trimming, converting to lowercase, and removing diacritics.
- * @param header - The header string to normalize.
- * @returns Normalized header.
- */
-function normalizeHeader(header: string): string {
-  return header.normalize("NFD").trim().toLowerCase();
-}
-
-/**
  * Verifies if Excel headers match the schema headers after normalization.
  * @param headers - Excel headers from the file.
  * @param headersSchema - Schema headers to validate against.
@@ -81,10 +72,9 @@ async function parseExcelFile(
   if (lines.length === 0) throw new Error("INVALID_HEADERS");
 
   // Normalize Excel headers and schema headers
-  const excelHeaders = lines[0].map(header => normalizeHeader(String(header)));
-  const normalizedSchema = headersSchema.map(normalizeHeader);
+  const excelHeaders = lines[0].map(header => String(header).normalize("NFD").trim().toLowerCase());
 
-  if (!validateHeaders(excelHeaders, normalizedSchema)) throw new Error("INVALID_HEADERS");
+  if (!validateHeaders(excelHeaders, headersSchema)) throw new Error("INVALID_HEADERS");
 
   const rows = lines.slice(1).filter(row => row.length > 0);
   if (rows.length === 0) throw new Error("EMPTY_ROWS");
@@ -103,6 +93,7 @@ async function parseExcelFile(
 }
 
 // Schema validation functions
+
 export async function validate_museologico(buffer: Buffer) {
   return parseExcelFile(buffer, Object.keys(museologico.fields), museologico.required);
 }
