@@ -22,7 +22,7 @@ function validateHeaders(headers: string[], headersSchema: string[]): boolean {
 function validateRows(
   json: { [key: string]: string }[],
   requiredFields: string[],
-  validateSituation: boolean = false
+  validateSituation: boolean
 ): { data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]>, naoEncontrados: Set<number> } {
   const missingFields = new Set<string>();
   const detailedErrors = new Map<number, string[]>();
@@ -30,13 +30,12 @@ function validateRows(
 
   json.forEach((row, index) => {
     requiredFields.forEach(field => {
-      if (!row[field]?.trim()) {
+      if (!row[field]) {
         missingFields.add(field);
         if (!detailedErrors.has(index)) detailedErrors.set(index, []);
         detailedErrors.get(index)?.push(field);
-        if (field === "Situação" && validateSituation && row[field] == "Não localizado") {
-          naoEncontrados.add(index);
-        }
+      } else if (validateSituation && field === "Situação" && row[field] === "Não localizado") {
+        naoEncontrados.add(index);
       };
     });
   });
