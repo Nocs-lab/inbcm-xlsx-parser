@@ -34,7 +34,7 @@ function validateRows(
         missingFields.add(field);
         if (!detailedErrors.has(index)) detailedErrors.set(index, []);
         detailedErrors.get(index)?.push(field);
-        if (field === "situacao" && validateSituation && row[field] !== "Não encontrado") {
+        if (field === "situacao" && validateSituation && row[field] !== "Não localizado") {
           naoEncontrados.add(index);
         }
       };
