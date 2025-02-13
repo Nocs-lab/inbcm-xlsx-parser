@@ -57,13 +57,20 @@ export async function readFile(file: File): Promise<ArrayBuffer> {
  * @param buffer - Excel file buffer.
  * @param headersSchema - Expected column headers.
  * @param requiredFields - Mandatory fields.
+ * @param validateSituation - Whether to validate the "situacao" field.
  * @returns Validation results.
  */
 async function parseExcelFile(
   buffer: Buffer,
   headersSchema: string[],
-  requiredFields: string[]
-): Promise<{ data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]> }> {
+  requiredFields: string[],
+): Promise<{ data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]> }>
+async function parseExcelFile(
+  buffer: Buffer,
+  headersSchema: string[],
+  requiredFields: string[],
+  validateSituation?: boolean
+): Promise<{ data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]>, naoEncontrados: string[] }> {
   const workbook = XLSX.read(buffer, { type: "buffer" });
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
@@ -102,11 +109,11 @@ async function parseExcelFile(
 // Schema validation functions
 
 export async function validate_museologico(buffer: Buffer) {
-  return parseExcelFile(buffer, Object.keys(museologico.fields), museologico.required);
+  return parseExcelFile(buffer, Object.keys(museologico.fields), museologico.required, true);
 }
 
 export async function validate_bibliografico(buffer: Buffer) {
-  return parseExcelFile(buffer, Object.keys(bibliografico.fields), bibliografico.required);
+  return parseExcelFile(buffer, Object.keys(bibliografico.fields), bibliografico.required, true);
 }
 
 export async function validate_arquivistico(buffer: Buffer) {
