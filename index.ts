@@ -16,14 +16,17 @@ function validateHeaders(headers: string[], headersSchema: string[]): boolean {
  * Validates rows for required fields.
  * @param json - Preprocessed data from Excel.
  * @param requiredFields - Fields that must be present.
+ * @param validateSituation - Whether to validate the "situacao" field.
  * @returns Validation results with data and errors.
  */
 function validateRows(
   json: { [key: string]: string }[],
-  requiredFields: string[]
-): { data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]> } {
+  requiredFields: string[],
+  validateSituation: boolean = false
+): { data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]>, naoEncontrados: Set<number> } {
   const missingFields = new Set<string>();
   const detailedErrors = new Map<number, string[]>();
+  const naoEncontrados = new Set<number>();
 
   json.forEach((row, index) => {
     requiredFields.forEach(field => {
@@ -31,11 +34,14 @@ function validateRows(
         missingFields.add(field);
         if (!detailedErrors.has(index)) detailedErrors.set(index, []);
         detailedErrors.get(index)?.push(field);
+        if (field === "situacao" && validateSituation && row[field] !== "Não encontrado") {
+          naoEncontrados.add(index);
+        }
       };
     });
   });
 
-  return { data: json, errors: Array.from(missingFields), detailedErrors };
+  return { data: json, errors: Array.from(missingFields), detailedErrors, naoEncontrados };
 }
 
 /**
@@ -64,13 +70,8 @@ async function parseExcelFile(
   buffer: Buffer,
   headersSchema: string[],
   requiredFields: string[],
-): Promise<{ data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]> }>
-async function parseExcelFile(
-  buffer: Buffer,
-  headersSchema: string[],
-  requiredFields: string[],
-  validateSituation?: boolean
-): Promise<{ data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]>, naoEncontrados: string[] }> {
+  validateSituation: boolean = false
+): Promise<{ data: { [key: string]: string }[]; errors: string[], detailedErrors: Map<number, string[]>, naoEncontrados: Set<number> }> {
   const workbook = XLSX.read(buffer, { type: "buffer" });
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
@@ -103,7 +104,7 @@ async function parseExcelFile(
     return obj;
   });
 
-  return validateRows(json, requiredFields);
+  return validateRows(json, requiredFields, validateSituation);
 }
 
 // Schema validation functions
