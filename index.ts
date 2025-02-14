@@ -30,12 +30,11 @@ function validateRows(
 
   json.forEach((row, index) => {
     requiredFields.forEach(field => {
-      console.log(field, row[field]);
       if (!row[field]) {
         missingFields.add(field);
         if (!detailedErrors.has(index)) detailedErrors.set(index, []);
         detailedErrors.get(index)?.push(field);
-      } else if (validateSituation && field === "Situação" && row[field] === "Não localizado") {
+      } else if (validateSituation && field === "situacaos" && row[field] === "Não localizado") {
         naoEncontrados.add(index);
       };
     });
