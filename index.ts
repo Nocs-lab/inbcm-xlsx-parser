@@ -35,11 +35,13 @@ function validateRows(
         missingFields.add(field);
         if (!detailedErrors.has(index)) detailedErrors.set(index, []);
         detailedErrors.get(index)?.push(field);
-      } else if (validateSituation && field === "situacao" && row[field] === "Não localizado") {
+      } else if (validateSituation && field === "situacao" && row[field] === "Não localizado") {
         naoEncontrados.add(index);
       };
     });
   });
+
+  console.log(missingFields, detailedErrors, naoEncontrados);
 
   return { data: json, errors: Array.from(missingFields), detailedErrors, naoEncontrados };
 }
