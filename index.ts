@@ -40,8 +40,6 @@ function validateRows(
     });
   });
 
-  console.log(Array.from(naoEncontrados));
-
   return { data: json, errors: Array.from(missingFields), detailedErrors, naoEncontrados };
 }
 
