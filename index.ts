@@ -30,7 +30,6 @@ function validateRows(
 
   json.forEach((row, index) => {
     requiredFields.forEach(field => {
-      console.log(field, row[field]);
       if (!row[field]) {
         missingFields.add(field);
         if (!detailedErrors.has(index)) detailedErrors.set(index, []);
@@ -41,7 +40,7 @@ function validateRows(
     });
   });
 
-  console.log(missingFields, detailedErrors, naoEncontrados);
+  console.log(Array.from(naoEncontrados));
 
   return { data: json, errors: Array.from(missingFields), detailedErrors, naoEncontrados };
 }
