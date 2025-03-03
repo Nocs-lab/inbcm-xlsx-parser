@@ -34,7 +34,7 @@ function validateRows(
         missingFields.add(field);
         if (!detailedErrors.has(index)) detailedErrors.set(index, []);
         detailedErrors.get(index)?.push(field);
-      } else if (validateSituation && field === "situacao" && row[field] === "Não localizado") {
+      } else if (validateSituation && field === "situacao" && row[field].toLocaleLowerCase() === "não localizado") {
         naoEncontrados.add(index);
       };
     });
@@ -98,7 +98,7 @@ async function parseExcelFile(
     if (row.length > excelHeaders.length) throw new Error("INVALID_ROW");
     const obj: { [key: string]: string } = {};
     excelHeaders.forEach((header, idx) => {
-      obj[header] = String(row[idx] || "").normalize("NFD").trim();
+      obj[header] = String(row[idx] || "").normalize("NFD").trim().replace(/  +/g, "");
     });
     return obj;
   });
